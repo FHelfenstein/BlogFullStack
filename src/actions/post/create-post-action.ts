@@ -59,7 +59,6 @@ export async function createPostAction(
     updatedAt: new Date().toISOString(),
     id: uuidV4(),
     slug: makeSlugFromText(validPostData.title),
-    published: true,
   };
 
   try {

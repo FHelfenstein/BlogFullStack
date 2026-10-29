@@ -42,20 +42,38 @@ export const PublicUserSchema = z.object({
   email: z.string().default(''),
 });
 
-export const UpdatePasswordSchema = z.object({
-  currentPassword: z
-    .string()
-    .trim()
-    .min(6, 'Senha precisa ter um mínimo de 6 caracteres'),
-  newPassword: z
-    .string()
-    .trim()
-    .min(6, 'Nova senha precisa ter um mínimo de 6 caracteres'),
-  newPassword2: z
-    .string()
-    .trim()
-    .min(6, 'Confirmação de senha precisa ter um mínimo de 6 caracteres'),
-});
+export const UpdatePasswordSchema = z
+  .object({
+    currentPassword: z
+      .string()
+      .trim()
+      .min(6, 'Senha precisa ter um mínimo de 6 caracteres'),
+    newPassword: z
+      .string()
+      .trim()
+      .min(6, 'Nova senha precisa ter um mínimo de 6 caracteres'),
+    newPassword2: z
+      .string()
+      .trim()
+      .min(6, 'Confirmação de senha precisa ter um mínimo de 6 caracteres'),
+  })
+  .refine(
+    data => {
+      // Confirma se newPassword e newPassword2 são iguais
+      return data.newPassword === data.newPassword2;
+    },
+    {
+      path: ['newPassword2'], // aponta o erro pro campo de confirmação
+      message: 'As senhas não conferem',
+    },
+  )
+  .transform(({ currentPassword, newPassword }) => {
+    // Remove o campo newPassword2
+    return {
+      currentPassword,
+      newPassword,
+    };
+  });
 
 export const UpdateUserSchema = CreateUserBase.omit({
   password: true,

@@ -21,8 +21,6 @@ export function CreateUserForm() {
     initialState,
   );
 
-  console.log('state: ', state);
-
   useEffect(() => {
     showMessage.dismiss();
     if (state.errors.length > 0) {
