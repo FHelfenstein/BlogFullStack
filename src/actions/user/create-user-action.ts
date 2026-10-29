@@ -30,7 +30,10 @@ export async function CreateUserAction(
   }
 
   const formDataToObj = Object.fromEntries(formData.entries());
+  console.log(formDataToObj);
+
   const zodParsedObj = CreateUserSchema.safeParse(formDataToObj);
+  console.log(zodParsedObj);
 
   if (!zodParsedObj.success) {
     return {

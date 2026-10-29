@@ -5,8 +5,31 @@ import { InputText } from '../InputText';
 import { Button } from '../Button';
 import { UserRoundIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useActionState, useEffect } from 'react';
+import { CreateUserAction } from '@/actions/user/create-user-action';
+import { PublicUserSchema } from '@/lib/user/schemas';
+import { showMessage } from '@/adapters/showMessage';
 
 export function CreateUserForm() {
+  const initialState = {
+    user: PublicUserSchema.parse({}),
+    errors: [],
+    success: false,
+  };
+  const [state, action, isPending] = useActionState(
+    CreateUserAction,
+    initialState,
+  );
+
+  console.log('state: ', state);
+
+  useEffect(() => {
+    showMessage.dismiss();
+    if (state.errors.length > 0) {
+      state.errors.forEach(error => showMessage.error(error));
+    }
+  }, [state]);
+
   return (
     <div
       className={clsx(
@@ -14,14 +37,14 @@ export function CreateUserForm() {
         'text-center max-w-sm mt-16 mb-32 mx-auto',
       )}
     >
-      <form action={''} className='flex-1 flex flex-col gap-6'>
+      <form action={action} className='flex-1 flex flex-col gap-6'>
         <InputText
           type='text'
-          name='username'
+          name='name'
           labelText='Nome'
           placeholder='Seu nome'
-          disabled={false}
-          defaultValue={''}
+          disabled={isPending}
+          defaultValue={state.user.name}
           required
         />
 
@@ -30,8 +53,8 @@ export function CreateUserForm() {
           name='email'
           labelText='E-mail'
           placeholder='Seu e-mail'
-          disabled={false}
-          defaultValue={''}
+          disabled={isPending}
+          defaultValue={state.user.email}
           required
         />
 
@@ -40,7 +63,7 @@ export function CreateUserForm() {
           name='password'
           labelText='Senha'
           placeholder='Sua senha'
-          disabled={false}
+          disabled={isPending}
           required
         />
 
@@ -49,13 +72,14 @@ export function CreateUserForm() {
           name='password2'
           labelText='Confirmar Senha'
           placeholder='Sua senha novamente'
-          disabled={false}
+          disabled={isPending}
           required
         />
 
-        <Button className='mt-4' type='submit' disabled={false}>
+        <Button className='mt-4' type='submit' disabled={isPending}>
           <UserRoundIcon />
-          Criar Conta
+          {!isPending && 'Criar Conta'}
+          {isPending && 'Criando...'}
         </Button>
 
         <p className='text-sm/tight'>
