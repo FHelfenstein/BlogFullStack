@@ -48,36 +48,3 @@ export const PostCreateSchema = PostBaseSchema;
 export const PostUpdateSchema = PostBaseSchema.extend({
   //id: z.uuid('ID Inválido'),
 });
-
-// const obj = {
-//   $ACTION_REF_1: '',
-//   '$ACTION_1:0':
-//     '{"id":"60b94a37d6883a6f2a822bebf7ddbd50ed53b42a72","bound":"$@1"}',
-//   '$ACTION_1:1':
-//     '[{"formState":{"id":"99f8add4-7684-4c16-a316-616271db199e","slug":"rotina-matinal-de-pessoas-altamente-eficazes","title":"Rotina matinal de pessoas altamente eficazes","author":"Isabela Nunes","excerpt":"O Next.js também é uma boa escolha para quem quer se preocupar com performance e SEO.","content":"O Next.js também é uma boa escolha para quem quer se preocupar com performance e SEO.","published":false,"createdAt":"2026-04-08T00:24:38.616Z","coverImageUrl":"/images/bryen_8.png"},"errors":[]}]',
-//   $ACTION_KEY: 'k1488883480',
-//   id: '99f8add4-7684-4c16-a316-616271db199e',
-//   slug: 'rotina-matinal-de-pessoas-altamente-eficazes',
-//   author: 'Isabela Nunes',
-//   title: '',
-//   excerpt:
-//     'O Next.js também é uma boa escolha para quem quer se preocupar com performance e SEO.',
-//   content:
-//     'O Next.js também é uma boa escolha para quem quer se preocupar com performance e SEO.',
-//   file: {
-//     size: 0,
-//     type: 'application/octet-stream',
-//     name: 'undefined',
-//     lastModified: 1791926721300,
-//   },
-//   coverImageUrl: 'images/bryen_8.png',
-//   published: 'on',
-// };
-
-// const result = PostCreateSchema.safeParse(obj);
-
-// if (!result.success) {
-//   const errors = getErrorMessages(z.treeifyError(result.error));
-
-//   console.log(errors);
-// }
