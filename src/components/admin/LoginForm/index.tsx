@@ -11,16 +11,16 @@ import { useActionState, useEffect } from 'react';
 
 export function LoginForm() {
   const initialState = {
-    username: '',
-    error: '',
+    email: '',
+    errors: [],
   };
 
   const [state, action, isPending] = useActionState(loginAction, initialState);
 
   useEffect(() => {
-    if (state.error) {
+    if (state.errors.length > 0) {
       showMessage.dismiss();
-      showMessage.error(state.error);
+      state.errors.forEach(error => showMessage.error(error));
     }
   }, [state]);
 
@@ -33,12 +33,13 @@ export function LoginForm() {
     >
       <form action={action} className='flex-1 flex flex-col gap-6'>
         <InputText
-          type='text'
-          name='username'
-          labelText='Usuário'
-          placeholder='Seu usuário'
+          type='email'
+          name='email'
+          labelText='E-mail'
+          placeholder='Seu e-mail'
           disabled={isPending}
-          defaultValue={state.username}
+          defaultValue={state.email}
+          required
         />
 
         <InputText
@@ -47,6 +48,7 @@ export function LoginForm() {
           labelText='Senha'
           placeholder='Sua senha'
           disabled={isPending}
+          required
         />
 
         <Button className='mt-4' type='submit' disabled={isPending}>
@@ -57,8 +59,6 @@ export function LoginForm() {
         <p className='text-sm/tight'>
           <Link href='/user/new'>Criar minha conta</Link>
         </p>
-
-        {!!state.error && <p className='text-red-600'>{state.error}</p>}
       </form>
     </div>
   );
