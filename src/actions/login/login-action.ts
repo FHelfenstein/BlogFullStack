@@ -1,9 +1,11 @@
 'use server';
 
+import { createLoginSessionFromApi } from '@/lib/login/manage-login';
 import { LoginSchema } from '@/lib/login/schemas';
 import { apiRequest } from '@/utils/api-request';
 import { asyncDelay } from '@/utils/async-delay';
 import { getErrorMessages } from '@/utils/get-zod-error-messages';
+import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 type loginActionState = {
@@ -30,7 +32,7 @@ export async function loginAction(state: loginActionState, formData: FormData) {
     };
   }
 
-  // validar
+  // validar dados do formulário com zod
   const formObj = Object.fromEntries(formData.entries());
   const formEmail = formObj?.email?.toString() || '';
   const parsedFormData = LoginSchema.safeParse(formObj);
@@ -42,29 +44,25 @@ export async function loginAction(state: loginActionState, formData: FormData) {
     };
   }
 
-  // fecth-Api
-  const result = await apiRequest<{ accesToken: string }>('/auth/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  //FECTH-API
+  const loginResponse = await apiRequest<{ accessToken: string }>(
+    '/auth/login',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(parsedFormData.data),
     },
-    body: JSON.stringify(parsedFormData.data),
-  });
-
-  if (!result.success) {
+  );
+  if (!loginResponse.success) {
     return {
       email: formEmail,
-      errors: result.errors,
+      errors: loginResponse.errors,
     };
   }
+  console.log(loginResponse.data.accessToken);
 
-  console.log(result.data);
-
-  // await createLoginSession(email);
-  // redirect('/admin/post');
-
-  return {
-    email: formEmail,
-    errors: ['Success'],
-  };
+  await createLoginSessionFromApi(loginResponse.data.accessToken);
+  redirect('/admin/post');
 }

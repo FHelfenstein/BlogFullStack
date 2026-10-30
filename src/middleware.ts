@@ -4,7 +4,7 @@ import { verifyToken } from './lib/login/manage-login';
 export async function middleware(request: NextRequest) {
   //console.log('URL: ', request.nextUrl.toString());
 
-  const isLoginPage = request.nextUrl.pathname.startsWith('/admin/login');
+  const isLoginPage = request.nextUrl.pathname.startsWith('/login');
   const isAdminPage = request.nextUrl.pathname.startsWith('/admin');
   const isGetRequest = request.method === 'GET';
 
@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
   const isAuthenticated = await verifyToken(jwtSession);
 
   if (!isAuthenticated) {
-    const loginUrl = new URL('/admin/login', request.url);
+    const loginUrl = new URL('/login', request.url);
     return NextResponse.redirect(loginUrl);
   }
 

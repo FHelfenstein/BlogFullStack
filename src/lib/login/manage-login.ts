@@ -2,7 +2,6 @@ import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { SignJWT, jwtVerify } from 'jose';
 import { redirect } from 'next/navigation';
-import { logColor } from '@/utils/log-color';
 
 type jwtPayload = {
   username: string;
@@ -90,8 +89,43 @@ export async function verifyToken(token: string | undefined = '') {
     });
     return payload;
   } catch {
-    //console.log('{Invalid token!}');
-    logColor('{Invalid token!}');
+    console.log('{Invalid token!}');
     return false;
+  }
+}
+
+// Novas Funções para Fetch - API - Backend
+export async function createLoginSessionFromApi(jwt: string) {
+  console.log('Rotina manage-login.ts - valor do accessToken: ', jwt);
+
+  const expiresAt = new Date(Date.now() + loginExpSeconds * 1000);
+  const loginSession = jwt;
+  const cookieStore = await cookies();
+
+  console.log('loginCookieName: ', loginCookieName);
+  console.log('loginSession: ', loginSession);
+
+  cookieStore.set(loginCookieName, loginSession, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+    expires: expiresAt,
+  });
+}
+
+export async function getLoginSessionForApi() {
+  const cookieStore = await cookies();
+  const jwt = cookieStore.get(loginCookieName)?.value;
+
+  if (!jwt) return false;
+
+  return jwt;
+}
+
+export async function requireLoginSessionForApiOrRedirect() {
+  const isAuthenticated = await getLoginSessionForApi();
+
+  if (!isAuthenticated) {
+    redirect('/login');
   }
 }

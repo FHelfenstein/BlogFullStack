@@ -37,13 +37,12 @@ export async function apiRequest<T>(
     }
 
     return {
-      success: true,
       data: json,
+      success: true,
       status: res.status,
     };
   } catch (err) {
     console.log(err);
-
     return {
       errors: ['Falha ao conectar-se ao servidor'],
       success: false,
