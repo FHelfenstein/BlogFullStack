@@ -96,14 +96,9 @@ export async function verifyToken(token: string | undefined = '') {
 
 // Novas Funções para Fetch - API - Backend
 export async function createLoginSessionFromApi(jwt: string) {
-  console.log('Rotina manage-login.ts - valor do accessToken: ', jwt);
-
   const expiresAt = new Date(Date.now() + loginExpSeconds * 1000);
   const loginSession = jwt;
   const cookieStore = await cookies();
-
-  console.log('loginCookieName: ', loginCookieName);
-  console.log('loginSession: ', loginSession);
 
   cookieStore.set(loginCookieName, loginSession, {
     httpOnly: true,

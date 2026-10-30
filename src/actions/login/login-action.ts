@@ -61,7 +61,7 @@ export async function loginAction(state: loginActionState, formData: FormData) {
       errors: loginResponse.errors,
     };
   }
-  console.log(loginResponse.data.accessToken);
+  console.log('AccessToken: ', loginResponse.data.accessToken);
 
   await createLoginSessionFromApi(loginResponse.data.accessToken);
   redirect('/admin/post');

@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from './lib/login/manage-login';
 
 export async function middleware(request: NextRequest) {
   //console.log('URL: ', request.nextUrl.toString());
 
-  const isLoginPage = request.nextUrl.pathname.startsWith('/login');
+  const isLoginPage = request.nextUrl.pathname.startsWith('/admin/login');
   const isAdminPage = request.nextUrl.pathname.startsWith('/admin');
   const isGetRequest = request.method === 'GET';
 
@@ -17,7 +16,7 @@ export async function middleware(request: NextRequest) {
   const jwtSession = request.cookies.get(
     process.env.LOGIN_COOKIE_NAME || 'loginSession',
   )?.value;
-  const isAuthenticated = await verifyToken(jwtSession);
+  const isAuthenticated = !!jwtSession;
 
   if (!isAuthenticated) {
     const loginUrl = new URL('/login', request.url);
