@@ -1,4 +1,6 @@
+import { PostModelFromApi } from '@/models/post-model';
 import { postRepository } from '@/repositories/post';
+import { apiRequest } from '@/utils/api-request';
 import { unstable_cache } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
@@ -29,4 +31,27 @@ export const findPublicPostBySlugCached = cache((slug: string) => {
     [`post-${slug}`],
     { tags: [`post-${slug}`] },
   )(slug);
+});
+
+// FETCH - API
+export const findAllPublicPostsFromApiCached = cache(async () => {
+  const postsResponse = await apiRequest<PostModelFromApi[]>(`/post`, {
+    next: {
+      tags: ['posts'],
+      revalidate: 86400,
+    },
+  });
+
+  return postsResponse;
+});
+
+export const findPublicPostBySlugFromApiCached = cache(async (slug: string) => {
+  const postResponse = await apiRequest<PostModelFromApi>(`/post/${slug}`, {
+    next: {
+      tags: [`post-${slug}`],
+      revalidate: 86400,
+    },
+  });
+
+  return postResponse;
 });

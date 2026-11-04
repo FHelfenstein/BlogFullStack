@@ -1,13 +1,21 @@
 import { PostCoverImage } from '../PostCoverImage';
 import { PostSummary } from '../PostSummary';
-import { findAllPublicPostsCached } from '@/lib/post/queries/public';
+import { findAllPublicPostsFromApiCached } from '@/lib/post/queries/public';
 
 // O COMANDO slice utilizado em conjunto com o map avança uma posição no array ,para que o postFeatured não seja repetido dentro do postsList
 
 export async function PostsList() {
-  const posts = await findAllPublicPostsCached();
+  const postsResponse = await findAllPublicPostsFromApiCached();
 
-  if (posts.length <= 1) return null;
+  if (!postsResponse.success) {
+    return null;
+  }
+
+  const posts = postsResponse.data;
+
+  if (posts.length <= 1) {
+    return null;
+  }
 
   return (
     <section className='grid grid-cols-1 mb-16 gap-8 sm:grid-cols-2 lg:grid-cols-3'>
