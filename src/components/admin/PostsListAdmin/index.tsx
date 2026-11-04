@@ -1,16 +1,30 @@
-import { findAllPostAdmin } from '@/lib/post/queries/admin';
+import { findAllPostFromApiAdmin } from '@/lib/post/queries/admin';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { DeletePostButton } from '../DeletePostButton';
 import ErrorMessage from '../../ErrorMessage';
 
 export default async function PostsListAdmin() {
-  const posts = await findAllPostAdmin();
+  const postsResponse = await findAllPostFromApiAdmin();
 
-  if (posts.length <= 0)
+  if (!postsResponse.success) {
+    console.log(postsResponse.errors);
+
+    return (
+      <ErrorMessage
+        contentTitle='Ei 😅'
+        content='Tente fazer login novamente'
+      />
+    );
+  }
+
+  const posts = postsResponse.data;
+
+  if (posts.length <= 0) {
     return (
       <ErrorMessage contentTitle='Ei 😅' content='Bora criar algum post??' />
     );
+  }
 
   return (
     <div className='mb-16'>

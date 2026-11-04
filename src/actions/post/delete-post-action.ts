@@ -1,12 +1,12 @@
 'use server';
 
-import { verifyLoginSession } from '@/lib/login/manage-login';
-import { postRepository } from '@/repositories/post';
+import { getLoginSessionForApi } from '@/lib/login/manage-login';
+import { PublicPostForApiDto } from '@/lib/post/schemas';
+import { authenticatedApiRequest } from '@/utils/authenticated-api-request';
 import { revalidateTag } from 'next/cache';
 
 export async function deletePostAction(id: string) {
-  // TODO: checar login do usuário
-  const isAuthenticated = await verifyLoginSession();
+  const isAuthenticated = await getLoginSessionForApi();
   if (!isAuthenticated) {
     return {
       error: 'Faça login novamente em outra aba.',
@@ -19,22 +19,39 @@ export async function deletePostAction(id: string) {
     };
   }
 
-  let post;
-  try {
-    post = await postRepository.delete(id);
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      };
-    }
+  const postResponse = await authenticatedApiRequest<PublicPostForApiDto>(
+    `/post/me/${id}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  );
+
+  if (!postResponse.success) {
     return {
-      error: 'Erro desconhecido',
+      error: 'Erro ao localizar o post.',
+    };
+  }
+
+  const deletePostResponse = await authenticatedApiRequest<PublicPostForApiDto>(
+    `/post/me/${id}`,
+    {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  );
+
+  if (!deletePostResponse.success) {
+    return {
+      error: 'Erro ao apagar post',
     };
   }
 
   revalidateTag('posts');
-  revalidateTag(`post-${post.slug}`);
+  revalidateTag(`post-${deletePostResponse.data.slug}`);
 
   return {
     error: '',
