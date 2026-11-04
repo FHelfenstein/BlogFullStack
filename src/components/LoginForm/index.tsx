@@ -9,6 +9,7 @@ import { LogInIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useActionState, useEffect } from 'react';
+import { HoneypotInput } from '../HoneypotInput';
 
 export function LoginForm() {
   const initialState = {
@@ -73,6 +74,8 @@ export function LoginForm() {
           disabled={isPending}
           required
         />
+
+        <HoneypotInput />
 
         <Button className='mt-4' type='submit' disabled={isPending}>
           <LogInIcon />

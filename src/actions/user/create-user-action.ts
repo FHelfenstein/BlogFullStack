@@ -8,6 +8,7 @@ import {
 import { apiRequest } from '@/utils/api-request';
 import { asyncDelay } from '@/utils/async-delay';
 import { getErrorMessages } from '@/utils/get-zod-error-messages';
+import { verifyHoneypotInput } from '@/utils/verify-honeypot-input';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
@@ -21,6 +22,16 @@ export async function CreateUserAction(
   state: CreateUserActionState,
   formData: FormData,
 ): Promise<CreateUserActionState> {
+  const isBot = await verifyHoneypotInput(formData, 3000); // controle AntiSPAM no formulário de login
+
+  if (isBot) {
+    return {
+      user: state.user,
+      errors: ['nice'],
+      success: false,
+    };
+  }
+
   await asyncDelay(3000);
 
   if (!(formData instanceof FormData)) {
