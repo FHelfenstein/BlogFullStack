@@ -1,8 +1,7 @@
 'use server';
 
-import { verifyLoginSession } from '@/lib/login/manage-login';
-import { mkdir, writeFile } from 'fs/promises';
-import { extname, resolve } from 'path';
+import { getLoginSessionForApi } from '@/lib/login/manage-login';
+import { authenticatedApiRequest } from '@/utils/authenticated-api-request';
 
 type uploadImageActionResult = {
   url: string;
@@ -12,8 +11,7 @@ type uploadImageActionResult = {
 export async function uploadImageAction(
   formData: FormData,
 ): Promise<uploadImageActionResult> {
-  // TODO: Verificar se o usuário está logado
-  const isAuthenticated = await verifyLoginSession();
+  const isAuthenticated = await getLoginSessionForApi();
 
   const makeResult = ({ url = '', error = '' }) => ({ url, error });
 
@@ -44,22 +42,19 @@ export async function uploadImageAction(
     return makeResult({ error: 'Imagem inválida!' });
   }
 
-  const imageExtension = extname(file.name); // pega a extensão do arquivo
-  const imageName = `${Date.now()}${imageExtension}`; // monta o nome do arquivo + extensão
+  const uploadResponse = await authenticatedApiRequest<{ url: string }>(
+    `/upload`,
+    {
+      method: 'POST',
+      body: formData,
+    },
+  );
 
-  const uploadDir = process.env.IMAGE_UPLOADER_DIRECTORY || 'uploads';
-  const uploadFullPath = resolve(process.cwd(), 'public', uploadDir);
-  await mkdir(uploadFullPath, { recursive: true }); // cria o diretório de acordo com o caminho completo fornecido
+  if (!uploadResponse.success) {
+    return makeResult({ error: uploadResponse.errors[0] });
+  }
 
-  const fullPathAbsolute = resolve(uploadFullPath, imageName); // monta o caminho absoluto com o nome do arquivo
-  const bytes = await file.arrayBuffer(); // pega o array de bytes
-  const buffer = Buffer.from(bytes); // transforma o array de bytes em buffer
-
-  await writeFile(fullPathAbsolute, buffer); // salva o arquivo
-
-  const imageServerUrl =
-    process.env.IMAGE_SERVER_URL || 'http://localhost:3000/uploads';
-  const url = `${imageServerUrl}/${imageName}`; // monta a url de retorno para visualizar a imagem
+  const url = `${process.env.IMAGE_SERVER_URL}${uploadResponse.data.url}`;
 
   return makeResult({ url });
 }
